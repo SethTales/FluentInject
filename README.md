@@ -12,6 +12,7 @@ FluentInject is a small dependency injection framework for .NET. The goals of th
 
 - allow the use of an activator func `Func<T>` to tell the container how to construct objects. This is really a table stakes feature of a DI framework and allows you to inject things like strings and ints into constructors
 - allow the resolution of a class without a corresponding interface. This is useful if you have a DTO that only has properties that you want to be able to resolve without defining an interface
+- implement service scoping
 - allow loading of types from assemblies
 - allow FluentInject to substitue for IServiceProvider for ASP.NET Core web applications
 

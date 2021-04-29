@@ -7,9 +7,14 @@ namespace FluentInject
     {
         private readonly ITypeRegistrations _typeRegistrations;
         
-        public ContainerBuilder()
+        private ContainerBuilder()
         {
             _typeRegistrations = new TypeRegistrations();
+        }
+
+        public static IContainerBuilder New()
+        {
+            return new ContainerBuilder();
         }
 
         public IContainerBuilder Register<TIn, TOut>(ServiceLifetime serviceLifetime = ServiceLifetime.Container)
@@ -18,9 +23,10 @@ namespace FluentInject
             return this;
         }
 
-        public IContainerBuilder Register<TIn, TOut>(Func<TOut> activatorFunc, ServiceLifetime serviceLifetime = ServiceLifetime.Container)
+        public IContainerBuilder Register<TIn>(Func<object> activatorFunc, ServiceLifetime serviceLifetime = ServiceLifetime.Container)
         {
-            throw new NotImplementedException();
+            _typeRegistrations.Add(typeof(TIn), new ServiceDescriptor(serviceLifetime, activatorFunc));
+            return this;
         }
 
         public IContainer Build()

@@ -5,12 +5,13 @@ FluentInject is a small dependency injection framework for .NET. The goals of th
 
 ## Features
 
-- currently FluentInject supports registrations of interfaces mapped to classes, and injecting interfaces as constructor parameters
+- registrations of interfaces mapped to classes
+- injecting interfaces as constructor parameters
+- injecting other types using an activator func
 - yes, this is a very limited feature set - more to come in the future
 
 ## Future Plans
 
-- allow the use of an activator func `Func<T>` to tell the container how to construct objects. This is really a table stakes feature of a DI framework and allows you to inject things like strings and ints into constructors
 - allow the resolution of a class without a corresponding interface. This is useful if you have a DTO that only has properties that you want to be able to resolve without defining an interface
 - implement service scoping
 - allow loading of types from assemblies
@@ -35,12 +36,22 @@ public class ClassB : B
 {}
 ```
 
-Instantiate a container builder, register your dependencies, and call `Build()` to return an instance of `IContainer`:
+Create a new container builder, register your dependencies, and call `Build()` to return an instance of `IContainer`:
 
 ```
- var container = new ContainerBuilder()
+ var container = ContainerBuilder
+                .New()
                 .Register<A, ClassA>()
                 .Register<B, ClassB>()
+                .Build();
+```
+
+Or provide an activator func:
+
+```
+var container = ContainerBuilder
+                .New()
+                .Register<A>(() => new A(new B()))
                 .Build();
 ```
 

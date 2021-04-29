@@ -6,5 +6,6 @@ namespace FluentInject.Models
     {
         Type ImplementationType { get; }
         ServiceLifetime ServiceLifetime { get; }
+        Func<object> ActivatorFunc { get; }
     }
 }

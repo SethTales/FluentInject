@@ -17,12 +17,19 @@ namespace FluentInject
 
         public T Resolve<T>()
         {
-            var implementationDescriptor = _typeRegistrations.Get(typeof(T));
+            var serviceDescriptor = _typeRegistrations.Get(typeof(T));
+
+            // if an activator function exists, use that to construct the object
+            if (serviceDescriptor.ActivatorFunc != null)
+            {
+                return (T) serviceDescriptor.ActivatorFunc.Invoke();
+            }
+
             var rootNode = new Node<IServiceDescriptor>
             {
-                Data = implementationDescriptor
+                Data = serviceDescriptor
             };
-            BuildDependencyTree(implementationDescriptor, rootNode);
+            BuildDependencyTree(serviceDescriptor, rootNode);
             ActivateDependencies(rootNode);
             return (T) rootNode.ActivatedObject;
         }
@@ -51,17 +58,16 @@ namespace FluentInject
 
         private static void ActivateDependencies(Node<IServiceDescriptor> rootNode)
         {
+            // traverse tree post-order
             foreach (var node in rootNode.ChildNodes)
             {
                 ActivateDependencies(node);
             }
 
             var ctor = GetConstructorInfo(rootNode.Data);
-
             rootNode.ActivatedObject = rootNode.ActivatedDependencies.Any()
                 ? ctor.Invoke(rootNode.ActivatedDependencies.ToArray())
                 : ctor.Invoke(null);
-
             rootNode.ParentNode?.ActivatedDependencies.Add(rootNode.ActivatedObject);
         }
 
